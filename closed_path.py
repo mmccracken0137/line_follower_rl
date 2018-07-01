@@ -44,12 +44,17 @@ class ClosedPath():
             df += -1.0 * self.amp * weights[i]*np.sin(i * theta + phases[i]) * i
         return df
 
+    def get_theta_from_xy(self, pos):
+        x_diff = pos[0] - self.center[0]
+        y_diff = - pos[1] + self.center[1] # neg b/c \hat{y} points downward
+        return np.arctan2(y_diff, x_diff)
+
     def tangent_angle(self, theta):
         r = self.path_radius(self.weights, self.phases, theta, self.bias)
         dr_dt = self.dr_dtheta(self.weights, self.phases, theta, self.bias)
         num = dr_dt * np.sin(theta) + r * np.cos(theta)
         den = dr_dt * np.cos(theta) - r * np.sin(theta)
-        phi = np.arctan2(num, den)
+        phi = np.arctan2(num, den) + np.pi
         return phi
 
     def gen_weights(self):

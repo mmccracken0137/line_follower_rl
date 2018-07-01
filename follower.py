@@ -226,30 +226,57 @@ class Follower():
         ### generate points of body
         self.update_body()
 
-    def wrap_vertical(self, grad):
+    def wrap_vertical(self, size):
         diff = 0.0
         new_y = 0.0
-        if self.center[1] < grad.border_width:
-            diff = self.center[1] - grad.border_width
-            new_y = grad.border_width + grad.grad_height - diff
-        elif self.center[1] > (grad.border_width + grad.grad_height):
-            diff = self.center[1] - (grad.border_width + grad.grad_height)
+        if self.center[1] < 0:
+            diff = self.center[1] - 0
+            new_y = grad.border_width - diff
+        elif self.center[1] > size[1]:
+            diff = self.center[1] - size[1]
             new_y = grad.border_width + diff
         else:
             return 0
         self.reset_position(self.center[0], new_y, self.theta)
         self.update_body()
 
+    def wrap_horizontal(self, size):
+        diff = 0.0
+        new_y = 0.0
+        if self.center[1] < 0:
+            diff = self.center[1] - 0
+            new_y = grad.border_width - diff
+        elif self.center[1] > size[1]:
+            diff = self.center[1] - size[1]
+            new_y = grad.border_width + diff
+        else:
+            return 0
+        self.reset_position(self.center[0], new_y, self.theta)
+        self.update_body()
+
+
     ### observation returns the gradient values at the points specified
     ### relies on grad_xy_rgb function defined in the gradient class
-    def observation(self, gradient, points):
+    def observation(self, screen, points):
         obs = []
         for p in points:
-            obs.append(gradient.grad_xy_rgb(p[0], p[1]))
+            ptint = (int(np.rint(p[0])), int(np.rint(p[1])))
+            obs.append(screen.get_at(ptint))
         obs = np.array(obs)
         obs = obs.astype(int)
-        #obs = np.ndarray.flatten(obs)
         return obs
+
+    # def check_out_of_bounds(self, size):
+    #     check = 0
+    #     run = True
+    #     for p in self.outline:
+    #         check += 1 if p[0] > size[0]
+    #         check += 1 if p[1] > size[1]
+    #         check += 1 if p[0] < 0
+    #         check += 1 if p[1] < 0
+    #     if check > 0:
+    #         run = False
+    #     return run
 
     # ### defines the reward for the current state/environment
     # def reward(self, gradient):
