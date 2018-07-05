@@ -29,6 +29,7 @@ gamma = 0.99 # discount factor
 decay_rate = 0.99 # decay factor for RMSprop leaky sum of grad^2 ???
 kindness = 0.2 # frequency that non-highest prob action will not be chosen (non-greedy choice)  ALERT ALERT this may not work for multi-output nets (i.e. >2 possible actions)...
 random_position_reset = True # reset the position of the rover randomly for each episode
+random_orientation = True # reset the direction (around track) of follower with each episode
 
 render = False # run visualization for each episode?
 resume = False # resume from previous trainng session?
@@ -124,9 +125,9 @@ def follower_action(a_index):
     '''
     a = np.zeros(2)
     if a_index == 0:
-        a[0] = 1
+        a[0] = 2
     elif a_index == 1:
-        a[1] = 1
+        a[1] = 2
     return a
 
 def follower_reward(ob, act, stp):
@@ -140,7 +141,7 @@ def follower_reward(ob, act, stp):
 
     sum = neg.sum()
     if sum > 0.0:
-        reward += 1e-2 * sum
+        reward += 2e-2 * sum
     else:
         penalty += -1e-2
 
@@ -208,6 +209,8 @@ while epi < max_epis:
     initx = path.get_x(initt)
     inity = path.get_y(initt)
     init_phi = path.tangent_angle(initt)
+    if random_orientation and np.random.rand() > 0.5:
+        init_phi += np.pi
     foll.reset_position(initx, inity, init_phi)
 
     if write_inits:

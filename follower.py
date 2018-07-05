@@ -261,7 +261,14 @@ class Follower():
         obs = []
         for p in points:
             ptint = (int(np.rint(p[0])), int(np.rint(p[1])))
-            obs.append(screen.get_at(ptint))
+            # return white if any sense point is outside bounds of screen
+            width, height = screen.get_size()
+            if ptint[0] < 1 or ptint[0] > width - 1:
+                obs.append((255, 255, 255, 255))
+            elif ptint[1] < 1 or ptint[1] > height - 1:
+                obs.append((255, 255, 255, 255))
+            else:
+                obs.append(screen.get_at(ptint))
         obs = np.array(obs)
         obs = obs.astype(int)
         return obs
